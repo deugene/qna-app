@@ -26,10 +26,10 @@ describe('Users', () => {
   after(done => server.close(done));
 
   describe('create', () => {
-    beforeEach(() => User.sync({ force: true }));
+    before(() => User.sync({ force: true }));
     after(() => User.sync({ force: true }));
 
-    it('should create user without errors', done => {
+    it('should create new user without errors', done => {
       let user = { name: 'Tony' };
       chai.request(server)
         .post('/api/users')
@@ -49,7 +49,7 @@ describe('Users', () => {
         });
     });
 
-    it('should not create user which name is too short', done => {
+    it('should not create new user if name is too short', done => {
       let user = { name: 'To' };
       chai.request(server)
         .post('/api/users')
@@ -61,13 +61,13 @@ describe('Users', () => {
           expect(res.body).to.not.have.property("data");
           expect(res.body).to.have.property("err");
           User.all().then(users => {
-            expect(users).to.have.length(0);
+            expect(users).to.have.length(1);
             done();
           });
         });
     });
 
-    it('should not create user which name is too long', done => {
+    it('should not create new user if name is too long', done => {
       let user = { name: 'T'.repeat(51) };
       chai.request(server)
         .post('/api/users')
@@ -79,21 +79,38 @@ describe('Users', () => {
           expect(res.body).to.not.have.property("data");
           expect(res.body).to.have.property("err");
           User.all().then(users => {
-            expect(users).to.have.length(0);
+            expect(users).to.have.length(1);
+            done();
+          });
+        });
+    });
+
+    it('should not create new user if name is already taken', done => {
+      let user = { name: 'Tony' };
+      chai.request(server)
+        .post('/api/users')
+        .set('Content-Type', 'application/json')
+        .send(user)
+        .end((err, res) => {
+          expect(res).to.have.status(200);
+          expect(res.body).to.be.an("object");
+          expect(res.body).to.not.have.property("data");
+          expect(res.body).to.have.property("err");
+          User.all().then(users => {
+            expect(users).to.have.length(1);
             done();
           });
         });
     });
   });
 
-  describe('findById', () => {
-    let userId;
-    before(() => User.create({ name: "Tony" }).then(user => userId = user.id));
+  describe('findByName', () => {
+    before(() => User.create({ name: "Tony" }));
     after(() => User.sync({ force: true }));
 
     it('should find existing user', done => {
       chai.request(server)
-        .get(`/api/users/${userId}`)
+        .get(`/api/users/Tony`)
         .end((err, res) => {
           expect(res).to.have.status(200);
           expect(res.body).to.be.an("object");
@@ -101,13 +118,14 @@ describe('Users', () => {
           expect(res.body).to.have.property("data");
           expect(res.body.data).to.have.property("name");
           expect(res.body.data.name).to.equal("Tony");
+          expect(res.body.data.id).to.equal(1);
           done();
         });
     });
 
     it('should not find not existing user', done => {
       chai.request(server)
-        .get(`/api/users/${userId + 1}`)
+        .get(`/api/users/Bruce`)
         .end((err, res) => {
           expect(res).to.have.status(200);
           expect(res.body).to.be.an("object");
@@ -120,13 +138,12 @@ describe('Users', () => {
   });
 
   describe('update', () => {
-    let userId;
-    beforeEach(() => User.create({ name: "Tony" }).then(user => userId = user.id));
+    beforeEach(() => User.create({ name: "Tony" }));
     afterEach(() => User.sync({ force: true }));
 
     it('should update existing user', done => {
       chai.request(server)
-        .put(`/api/users/${userId}`)
+        .put(`/api/users/1`)
         .set('Content-Type', 'application/json')
         .send({ name: 'Steve' })
         .end((err, res) => {
@@ -142,7 +159,7 @@ describe('Users', () => {
 
     it('should not update not existing user', done => {
       chai.request(server)
-        .put(`/api/users/${userId + 1}`)
+        .put(`/api/users/2`)
         .set('Content-Type', 'application/json')
         .send({ name: 'Bruce' })
         .end((err, res) => {
@@ -156,13 +173,12 @@ describe('Users', () => {
   });
 
   describe('destroy', () => {
-    let userId;
-    beforeEach(() => User.create({ name: "Tony" }).then(user => userId = user.id));
+    beforeEach(() => User.create({ name: "Tony" }));
     afterEach(() => User.sync({ force: true }));
 
     it('should delete existing user', done => {
       chai.request(server)
-        .delete(`/api/users/${userId}`)
+        .delete(`/api/users/1`)
         .end((err, res) => {
           expect(res).to.have.status(200);
           expect(res.body).to.be.an("object");
@@ -179,7 +195,7 @@ describe('Users', () => {
 
     it('should not delete not existing user', done => {
       chai.request(server)
-        .delete(`/api/users/${userId + 1}`)
+        .delete(`/api/users/2`)
         .end((err, res) => {
           expect(res).to.have.status(200);
           expect(res.body).to.be.an("object");

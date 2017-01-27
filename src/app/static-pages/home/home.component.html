@@ -1,0 +1,10 @@
+<p>
+  Welcome to the QnA App! Please enter your name to start!
+</p>
+<form #nameForm="ngForm" (ngSubmit)="onSubmit()" >
+  <input type="text"
+         placeholder="Name"
+         [(ngModel)]="name"
+         name="name">
+  <button type="submit">Submit</button>
+</form>

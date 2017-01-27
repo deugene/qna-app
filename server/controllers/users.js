@@ -5,7 +5,7 @@ const User = models.User;
 
 module.exports = {
   create(req, res, next) {
-    User.findOne({ name: req.body.name })
+    User.findOne({ where: { name: req.body.name } })
       .then(user => {
         if (user) { throw new Error('User Already Exists'); }
         const newUser = req.body;
@@ -14,8 +14,8 @@ module.exports = {
       .then(newUser => res.json({ data: newUser }))
       .catch(next);
   },
-  findById(req, res, next) {
-    User.findById(req.params.userId)
+  findByName(req, res, next) {
+    User.findOne({ where: { name: req.params.userName } })
       .then(user => {
         if (!user) { throw new Error('User Not Found'); }
         res.json({ data: user });

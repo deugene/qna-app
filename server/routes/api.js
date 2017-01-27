@@ -2,8 +2,8 @@ const router = require('express').Router();
 const controllers = require('../controllers');
 
 // users
+router.get('/users/:userName', controllers.users.findByName);
 router.post('/users', controllers.users.create);
-router.get('/users/:userId', controllers.users.findById);
 router.put('/users/:userId', controllers.users.update);
 router.delete('/users/:userId', controllers.users.destroy);
 
