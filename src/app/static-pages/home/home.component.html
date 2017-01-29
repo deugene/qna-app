@@ -1,10 +1,17 @@
-<p>
-  Welcome to the QnA App! Please enter your name to start!
-</p>
-<form #nameForm="ngForm" (ngSubmit)="onSubmit()" >
+<h5>
+  {{ title }}
+</h5>
+
+<form class="form-inline" #nameForm="ngForm" (ngSubmit)="onSubmit()">
+  <label class="sr-only" for="name">Name</label>
   <input type="text"
+         class="form-control mb-2 mr-sm-2 mb-sm-0"
+         id="name"
          placeholder="Name"
          [(ngModel)]="name"
-         name="name">
-  <button type="submit">Submit</button>
+         name="name"
+         required
+         pattern=".{3,50}">
+
+  <button type="submit" class="btn btn-primary">Submit</button>
 </form>

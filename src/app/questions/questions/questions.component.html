@@ -1,3 +1,44 @@
-<p>
-  questions works!
-</p>
+<div *ngIf="currentUser" class="container">
+  <div class="row justify-content-end">
+    <div class="col-xs-6">
+      <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Filter by answers
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+          <a class="dropdown-item" (click)="filter('all')" role="button">All</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" (click)="filter('answered')" role="button">Answered</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" (click)="filter('unanswered')" role="button">Unanswered</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-6">
+      <div class="btn-group" data-toggle="buttons">
+        <label class="btn btn-primary active">
+          <input type="checkbox" checked autocomplete="off">Show only my questions
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <ul class="list-group" id="questions">
+    <li *ngFor="let question of questions | paginate: { id: 'questions', itemsPerPage: itemsLimit, currentPage: currentPage, totalItems: totalItems }"
+        class="list-group-item">
+      <span class="d-block">
+        <a routerLink="/questions/{{question.author.id}}">
+          {{question.title}}
+        </a>
+      </span>
+      <span class="d-block">{{question.body}}</span>
+      <span class="small text-muted">
+        posted at {{postedAt(question.createdAt)}}
+      </span>
+      <span class="d-block">author: {{question.author}}</span>
+    </li>
+  </ul>
+
+  <pagination-controls id="questions" (pageChange)="pageChanged($event)"></pagination-controls>
+
+</div>

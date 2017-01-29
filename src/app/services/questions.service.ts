@@ -10,6 +10,13 @@ export interface PaginationResult {
   data: Question[];
 }
 
+export interface QuestionSearchOpts {
+  offset: number;
+  limit: number;
+  userId?: number;
+  status?: string;
+}
+
 @Injectable()
 export class QuestionsService {
   private headers = new Headers({ 'Content-Type': 'application/json' });
@@ -18,11 +25,11 @@ export class QuestionsService {
 
   // api interface
 
-  all(paginagionOpts: any): Promise<PaginationResult> {
+  all(searchOpts: QuestionSearchOpts): Promise<PaginationResult> {
     return this.http
       .post(
         `api/questions`,
-        JSON.stringify(paginagionOpts),
+        JSON.stringify(searchOpts),
         { headers: this.headers }
       )
       .toPromise()
@@ -62,7 +69,7 @@ export class QuestionsService {
       .catch(this.errorHandler);
   }
 
-  update(id: number, updates: Question): Promise<Question> {
+  update(id: number, updates: any): Promise<Question> {
     return this.http
       .put(`api/questions/${id}`, JSON.stringify(updates), { headers: this.headers })
       .toPromise()

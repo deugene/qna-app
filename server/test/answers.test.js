@@ -32,8 +32,8 @@ describe('Answers', () => {
       return User.create({ name: 'Tony' })
         .then(() => {
           return Promise.all([
-            Question.create({ body: "question0", userId: 1 }),
-            Question.create({ body: "question1", userId: 1 }),
+            Question.create({ body: "question0", title: "question0", userId: 1 }),
+            Question.create({ body: "question1", title: "question1", userId: 1 }),
           ]);
         })
         .then(() => {

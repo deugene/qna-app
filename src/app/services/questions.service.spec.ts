@@ -120,7 +120,7 @@ describe('QuestionsService', () => {
           );
         });
 
-      service.create(new Question('lorem'))
+      service.create(new Question('lorem', 'lorem'))
         .then(question => {
           expect(question.id).toEqual(1);
           expect(question.body).toMatch('lorem');

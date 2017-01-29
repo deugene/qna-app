@@ -41,9 +41,9 @@ describe('Questions', () => {
       ])
         .then(() => {
           return Promise.all([
-            Question.create({ body: "lorem0", userId: 1 }),
-            Question.create({ body: "lorem1", userId: 2 }),
-            Question.create({ body: "lorem2", userId: 1 })
+            Question.create({ body: "lorem0", title: "lorem0", userId: 1 }),
+            Question.create({ body: "lorem1", title: "lorem1", userId: 2 }),
+            Question.create({ body: "lorem2", title: "lorem2", userId: 1 })
           ]);
         });
     });

@@ -46,7 +46,7 @@ export class AnswersService {
       .catch(this.errorHandler);
   }
 
-  update(id: number, updates: Answer): Promise<Answer> {
+  update(id: number, updates: any): Promise<Answer> {
     return this.http
       .put(`api/answers/${id}`, JSON.stringify(updates), { headers: this.headers })
       .toPromise()

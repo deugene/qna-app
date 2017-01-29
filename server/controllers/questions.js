@@ -3,6 +3,7 @@
 const models = require('../models');
 const Question = models.Question;
 const Answer = models.Answer;
+const User = models.User;
 
 module.exports = {
   all(req, res, next) {
@@ -10,7 +11,8 @@ module.exports = {
     // define find options
     let opts = {
       offset: req.body.offset,
-      limit: req.body.limit
+      limit: req.body.limit,
+      include: [ { model: User, as: 'author' } ]
     };
     const userId = req.body.userId;
     if (userId) {
@@ -21,11 +23,7 @@ module.exports = {
     // update find optinos, find and send questions if unanswered questions are
     // needed
     if (status && status === 'unanswered') {
-      Object.assign(opts, {
-        include: [
-          { model: Answer, as: 'answers', attributes: [ 'id' ] }
-        ]
-      });
+      opts.include.push({ model: Answer, as: 'answers', attributes: [ 'id' ] });
       Question.findAll(opts)
         .then(questions => {
           const notAnsweredQuestions = questions.filter(q => {
@@ -43,15 +41,11 @@ module.exports = {
 
       // update find options if answered questions are needed
       if (status && status === 'answered') {
-        Object.assign(opts, {
-          include: [
-            {
-              model: Answer,
-              where: { questionId: { $ne: null } },
-              attributes: [ 'id' ],
-              as: 'answers'
-            }
-          ]
+        opts.include.push({
+          model: Answer,
+          where: { questionId: { $ne: null } },
+          attributes: [ 'id' ],
+          as: 'answers'
         });
       }
 

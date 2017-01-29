@@ -8,6 +8,7 @@ import 'rxjs/add/operator/toPromise';
 @Injectable()
 export class UsersService {
   private headers = new Headers({ 'Content-Type': 'application/json' });
+  currentUser: User;
 
   constructor(private http: Http) { }
 
@@ -41,7 +42,7 @@ export class UsersService {
       .catch(this.errorHandler);
   }
 
-  update(id: number, updates: User): Promise<User> {
+  update(id: number, updates: any): Promise<User> {
     return this.http
       .put(`api/users/${id}`, JSON.stringify(updates), { headers: this.headers })
       .toPromise()
@@ -65,7 +66,14 @@ export class UsersService {
       .catch(this.errorHandler);
   }
 
-  errorHandler(err: any): void {
+  // change user
+
+  changeUser(): Promise<void> {
+    localStorage.removeItem('currentUser');
+    return Promise.resolve();
+  }
+
+  private errorHandler(err: any): void {
     console.error(err);
   }
 
