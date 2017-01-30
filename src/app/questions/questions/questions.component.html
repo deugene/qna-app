@@ -1,6 +1,6 @@
 <div *ngIf="currentUser" class="container">
   <div class="row justify-content-end">
-    <div class="col-xs-6">
+    <div class="col-xs-4">
       <div class="dropdown">
         <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           Filter by answers
@@ -14,12 +14,17 @@
         </div>
       </div>
     </div>
-    <div class="col-xs-6">
+    <div class="col-xs-4">
       <div class="btn-group" data-toggle="buttons">
         <label class="btn btn-primary active">
           <input type="checkbox" checked autocomplete="off">Show only my questions
         </label>
       </div>
+    </div>
+    <div class="col-xs-4">
+      <button class="btn btn-primary">
+        New question
+      </button>
     </div>
   </div>
 

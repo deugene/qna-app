@@ -23,12 +23,18 @@ module.exports = {
     // update find optinos, find and send questions if unanswered questions are
     // needed
     if (status && status === 'unanswered') {
-      opts.include.push({ model: Answer, as: 'answers', attributes: [ 'id' ] });
+      opts.include.push({
+        model: Answer,
+        as: 'answers',
+        required: false,
+        attributes: [ 'id' ]
+      });
       Question.findAll(opts)
         .then(questions => {
           const notAnsweredQuestions = questions.filter(q => {
             return q.answers.length === 0;
           });
+          console.log(notAnsweredQuestions);
           res.json({
             count: notAnsweredQuestions.length,
             data: notAnsweredQuestions.slice(

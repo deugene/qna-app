@@ -19,48 +19,42 @@ const app = require('../app');
 const server = http.createServer(app);
 
 // require Question model
-const Question = require('../models').Question;
-const User = require('../models').User;
-const Answer = require('../models').Answer;
+const models = require('../models');
+const Question = models.Question;
+const User = models.User;
+const Answer = models.Answer;
+const sequelize = models.sequelize;
 
 describe('Questions', () => {
-  before(done => {
-    Question.sync({ force: true })
-      .then(() => server.listen(3001, done));
-  });
-  before(done => {
-    Question.sync({ force: true })
-      .then(() => server.close(done));
-  });
+  before(done => server.listen(3001, done));
+  after(done => server.close(done));
 
   describe('all', () => {
     before(() => {
-      return Promise.all([
-        User.create({ name: 'Tony' }),
-        User.create({ name: 'Bruce' })
-      ])
+      return sequelize.truncate({ restartIdentity: true, cascade: true })
         .then(() => {
           return Promise.all([
-            Question.create({ body: "lorem0", title: "lorem0", userId: 1 }),
-            Question.create({ body: "lorem1", title: "lorem1", userId: 2 }),
-            Question.create({ body: "lorem2", title: "lorem2", userId: 1 })
-          ]);
+            User.create({ name: 'Tony' }),
+            User.create({ name: 'Bruce' })
+          ])
+            .then(() => {
+              return Question.create({ body: "lorem0", title: "lorem0", userId: 1 })
+                .then(() => Question.create({ body: "lorem1", title: "lorem1", userId: 2 }))
+                .then(() => Question.create({ body: "lorem2", title: "lorem2", userId: 1 }));
+            });
         });
     });
-    after(() => {
-      return Question.sync({ force: true })
-        .then(() => User.sync({ force: true}));
-    });
+    after(() => sequelize.truncate({ restartIdentity: true, cascade: true }));
 
     it('should find all existing question', done => {
-      const findOpts = {
+      const searchOpts = {
         offset: 0,
         limit: 10
       };
       chai.request(server)
         .post('/api/questions/all')
         .set('Content-Type', 'application/json')
-        .send(findOpts)
+        .send(searchOpts)
         .end((err, res) => {
           expect(res).to.have.status(200);
           expect(res.body).to.be.an("object");
@@ -76,7 +70,7 @@ describe('Questions', () => {
     });
 
     it('should find all existing question by user id', done => {
-      const findOpts = {
+      const searchOpts = {
         offset: 0,
         limit: 10,
         userId: 1
@@ -84,7 +78,7 @@ describe('Questions', () => {
       chai.request(server)
         .post('/api/questions/all')
         .set('Content-Type', 'application/json')
-        .send(findOpts)
+        .send(searchOpts)
         .end((err, res) => {
           expect(res).to.have.status(200);
           expect(res.body).to.be.an("object");
@@ -100,11 +94,11 @@ describe('Questions', () => {
     });
 
     it('should paginate result', done => {
-      let findOpts = { offset: 0, limit: 2 };
+      let searchOpts = { offset: 0, limit: 2 };
       chai.request(server)
         .post('/api/questions/all')
         .set('Content-Type', 'application/json')
-        .send(findOpts)
+        .send(searchOpts)
         .end((err, res) => {
           expect(res).to.have.status(200);
           expect(res.body).to.be.an("object");
@@ -115,11 +109,11 @@ describe('Questions', () => {
           expect(res.body.data[0]).to.have.property("body");
           expect(res.body.data[0].body).to.equal("lorem0");
           expect(res.body.count).to.equal(3);
-          findOpts = { offset: 2, limit: 2 };
+          searchOpts = { offset: 2, limit: 2 };
           chai.request(server)
             .post('/api/questions/all')
             .set('Content-Type', 'application/json')
-            .send(findOpts)
+            .send(searchOpts)
             .end((err, res) => {
               expect(res).to.have.status(200);
               expect(res.body).to.be.an("object");
@@ -129,17 +123,18 @@ describe('Questions', () => {
               expect(res.body.data).to.have.length(1);
               expect(res.body.data[0]).to.have.property("body");
               expect(res.body.data[0].body).to.equal("lorem2");
+              expect(res.body.count).to.equal(3);
               done();
             });
         });
     });
 
     describe('answered questions', () => {
-      before(() => Answer.create({ body: 'lorem', questionId: 1}));
-      after(() => Answer.sync({ force: true }));
+      before(() => Answer.create({ body: 'lorem', questionId: 1, userId: 1}));
+      after(() => sequelize.truncate({ restartIdentity: true, cascade: true }));
 
       it('should find answered questions', done => {
-        const findOpts = {
+        const searchOpts = {
           offset: 0,
           limit: 10,
           status: 'answered'
@@ -147,7 +142,7 @@ describe('Questions', () => {
         chai.request(server)
           .post('/api/questions/all')
           .set('Content-Type', 'application/json')
-          .send(findOpts)
+          .send(searchOpts)
           .end((err, res) => {
             expect(res).to.have.status(200);
             expect(res.body).to.be.an("object");
@@ -163,7 +158,7 @@ describe('Questions', () => {
       });
 
       it('should find unanswered questions', done => {
-        const findOpts = {
+        const searchOpts = {
           offset: 0,
           limit: 10,
           status: 'unanswered'
@@ -171,7 +166,7 @@ describe('Questions', () => {
         chai.request(server)
           .post('/api/questions/all')
           .set('Content-Type', 'application/json')
-          .send(findOpts)
+          .send(searchOpts)
           .end((err, res) => {
             expect(res).to.have.status(200);
             expect(res.body).to.be.an("object");
@@ -190,8 +185,8 @@ describe('Questions', () => {
   });
 
   describe('findById', () => {
-    before(() => Question.create({ body: "lorem" }));
-    after(() => Question.sync({ force: true }));
+    before(() => Question.create({ body: "lorem", title: "lorem" }));
+    after(() => sequelize.truncate({ restartIdentity: true, cascade: true }));
 
     it('should find existing question', done => {
       chai.request(server)
@@ -222,11 +217,11 @@ describe('Questions', () => {
   });
 
   describe('create', () => {
-    beforeEach(() => Question.sync({ force: true }));
-    after(() => Question.sync({ force: true }));
+    beforeEach(() => sequelize.truncate({ restartIdentity: true, cascade: true }));
+    afterEach(() => sequelize.truncate({ restartIdentity: true, cascade: true }));
 
     it('should create question without errors', done => {
-      let question = { body: 'lorem' };
+      let question = { body: 'lorem', title: 'lorem' };
       chai.request(server)
         .post('/api/questions')
         .set('Content-Type', 'application/json')
@@ -246,7 +241,7 @@ describe('Questions', () => {
     });
 
     it('should not create question which body is too short', done => {
-      let question = { body: 'bo' };
+      let question = { body: 'bo', title: 'lorem' };
       chai.request(server)
         .post('/api/questions')
         .set('Content-Type', 'application/json')
@@ -264,7 +259,7 @@ describe('Questions', () => {
     });
 
     it('should not create question which body is too long', done => {
-      let question = { body: 'b'.repeat(5001) };
+      let question = { body: 'b'.repeat(5001), title: 'lorem' };
       chai.request(server)
         .post('/api/questions')
         .set('Content-Type', 'application/json')
@@ -283,8 +278,8 @@ describe('Questions', () => {
   });
 
   describe('update', () => {
-    beforeEach(() => Question.create({ body: "lorem" }));
-    afterEach(() => Question.sync({ force: true }));
+    beforeEach(() => Question.create({ body: 'lorem', title: 'lorem' }));
+    afterEach(() => sequelize.truncate({ restartIdentity: true, cascade: true }));
 
     it('should update existing question', done => {
       chai.request(server)
@@ -318,8 +313,8 @@ describe('Questions', () => {
   });
 
   describe('destroy', () => {
-    beforeEach(() => Question.create({ body: "lorem" }));
-    afterEach(() => Question.sync({ force: true }));
+    beforeEach(() => Question.create({ body: 'lorem', title: 'lorem' }));
+    afterEach(() => sequelize.truncate({ restartIdentity: true, cascade: true }));
 
     it('should delete existing question', done => {
       chai.request(server)

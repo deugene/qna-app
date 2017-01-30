@@ -19,9 +19,11 @@ const app = require('../app');
 const server = http.createServer(app);
 
 // require Answer model
-const Answer = require('../models').Answer;
-const Question = require('../models').Question;
-const User = require('../models').User;
+const models = require('../models');
+const Answer = models.Answer;
+const Question = models.Question;
+const User = models.User;
+const sequelize = models.sequelize;
 
 describe('Answers', () => {
   before(done => server.listen(3001, done));
@@ -29,37 +31,34 @@ describe('Answers', () => {
 
   describe('findAllByQuestionId', () => {
     before(() => {
-      return User.create({ name: 'Tony' })
+      return sequelize.truncate({ restartIdentity: true, cascade: true })
         .then(() => {
-          return Promise.all([
-            Question.create({ body: "question0", title: "question0", userId: 1 }),
-            Question.create({ body: "question1", title: "question1", userId: 1 }),
-          ]);
-        })
-        .then(() => {
-          return Promise.all([
-            Answer.create({ body: "lorem0", questionId: 1, userId: 1 }),
-            Answer.create({ body: "lorem1", questionId: 1, userId: 1 }),
-            Answer.create({ body: "lorem2", questionId: 2, userId: 1 }),
-            Answer.create({ body: "lorem3", questionId: 1, userId: 1 })
-          ]);
+          return User.create({ name: 'Tony' })
+            .then(() => {
+              return Promise.all([
+                Question.create({ body: "question0", title: "question0", userId: 1 }),
+                Question.create({ body: "question1", title: "question1", userId: 1 }),
+              ]);
+            })
+            .then(() => {
+              return Answer.create({ body: "lorem0", questionId: 1, userId: 1 })
+                .then(() => Answer.create({ body: "lorem1", questionId: 1, userId: 1 }))
+                .then(() => Answer.create({ body: "lorem2", questionId: 2, userId: 1 }))
+                .then(() => Answer.create({ body: "lorem3", questionId: 1, userId: 1 }));
+            });
         });
     });
-    after(() => {
-      return Answer.sync({ force: true })
-        .then(() => Question.sync({ force: true }))
-        .then(() => User.sync({ force: true}));
-    });
+    after(() => sequelize.truncate({ restartIdentity: true, cascade: true }));
 
     it('should find all existing answers for current question', done => {
-      const findOpts = {
+      const searchOpts = {
         offset: 0,
         limit: 10
       };
       chai.request(server)
         .post('/api/questions/1/answers')
         .set('Content-Type', 'application/json')
-        .send(findOpts)
+        .send(searchOpts)
         .end((err, res) => {
           expect(res).to.have.status(200);
           expect(res.body).to.be.an("object");
@@ -75,11 +74,11 @@ describe('Answers', () => {
     });
 
     it('should paginate result', done => {
-      let findOpts = { offset: 0, limit: 2 };
+      let searchOpts = { offset: 0, limit: 2 };
       chai.request(server)
         .post('/api/questions/1/answers')
         .set('Content-Type', 'application/json')
-        .send(findOpts)
+        .send(searchOpts)
         .end((err, res) => {
           expect(res).to.have.status(200);
           expect(res.body).to.be.an("object");
@@ -90,11 +89,11 @@ describe('Answers', () => {
           expect(res.body.data[0]).to.have.property("body");
           expect(res.body.data[0].body).to.equal("lorem0");
           expect(res.body.count).to.equal(3);
-          findOpts = { offset: 2, limit: 2 };
+          searchOpts = { offset: 2, limit: 2 };
           chai.request(server)
             .post('/api/questions/1/answers')
             .set('Content-Type', 'application/json')
-            .send(findOpts)
+            .send(searchOpts)
             .end((err, res) => {
               expect(res).to.have.status(200);
               expect(res.body).to.be.an("object");
@@ -112,8 +111,8 @@ describe('Answers', () => {
   });
 
   describe('create', () => {
-    beforeEach(() => Answer.sync({ force: true }));
-    after(() => Answer.sync({ force: true }));
+    beforeEach(() => sequelize.truncate({ restartIdentity: true, cascade: true }));
+    afterEach(() => sequelize.truncate({ restartIdentity: true, cascade: true }));
 
     it('should create answer without errors', done => {
       let answer = { body: 'lorem' };
@@ -174,7 +173,7 @@ describe('Answers', () => {
 
   describe('update', () => {
     beforeEach(() => Answer.create({ body: "lorem" }));
-    afterEach(() => Answer.sync({ force: true }));
+    afterEach(() => sequelize.truncate({ restartIdentity: true, cascade: true }));
 
     it('should update existing answer', done => {
       chai.request(server)
@@ -209,7 +208,7 @@ describe('Answers', () => {
 
   describe('destroy', () => {
     beforeEach(() => Answer.create({ body: "lorem" }));
-    afterEach(() => Answer.sync({ force: true }));
+    afterEach(() => sequelize.truncate({ restartIdentity: true, cascade: true }));
 
     it('should delete existing answer', done => {
       chai.request(server)

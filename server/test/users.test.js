@@ -19,15 +19,52 @@ const app = require('../app');
 const server = http.createServer(app);
 
 // require User model
-const User = require('../models').User;
+const models = require('../models');
+const User = models.User;
+const sequelize = models.sequelize;
+
 
 describe('Users', () => {
   before(done => server.listen(3001, done));
   after(done => server.close(done));
 
+  describe('findByName', () => {
+    before(() => sequelize.truncate({ restartIdentity: true, cascade: true })
+      .then(() => User.create({ name: "Tony" })));
+    after(() => sequelize.truncate({ restartIdentity: true, cascade: true }));
+
+    it('should find existing user', done => {
+      chai.request(server)
+        .get(`/api/users/Tony`)
+        .end((err, res) => {
+          expect(res).to.have.status(200);
+          expect(res.body).to.be.an("object");
+          expect(res.body).to.not.have.property("err");
+          expect(res.body).to.have.property("data");
+          expect(res.body.data).to.have.property("name");
+          expect(res.body.data.name).to.equal("Tony");
+          expect(res.body.data.id).to.equal(1);
+          done();
+        });
+    });
+
+    it('should not find not existing user', done => {
+      chai.request(server)
+        .get(`/api/users/Bruce`)
+        .end((err, res) => {
+          expect(res).to.have.status(200);
+          expect(res.body).to.be.an("object");
+          expect(res.body).to.have.property("err");
+          expect(res.body).to.not.have.property("data");
+          done();
+        });
+    });
+
+  });
+
   describe('create', () => {
-    before(() => User.sync({ force: true }));
-    after(() => User.sync({ force: true }));
+    beforeEach(() => sequelize.truncate({ restartIdentity: true, cascade: true }));
+    afterEach(() => sequelize.truncate({ restartIdentity: true, cascade: true }));
 
     it('should create new user without errors', done => {
       let user = { name: 'Tony' };
@@ -61,7 +98,7 @@ describe('Users', () => {
           expect(res.body).to.not.have.property("data");
           expect(res.body).to.have.property("err");
           User.all().then(users => {
-            expect(users).to.have.length(1);
+            expect(users).to.have.length(0);
             done();
           });
         });
@@ -79,67 +116,37 @@ describe('Users', () => {
           expect(res.body).to.not.have.property("data");
           expect(res.body).to.have.property("err");
           User.all().then(users => {
-            expect(users).to.have.length(1);
+            expect(users).to.have.length(0);
             done();
           });
         });
     });
 
     it('should not create new user if name is already taken', done => {
-      let user = { name: 'Tony' };
-      chai.request(server)
-        .post('/api/users')
-        .set('Content-Type', 'application/json')
-        .send(user)
-        .end((err, res) => {
-          expect(res).to.have.status(200);
-          expect(res.body).to.be.an("object");
-          expect(res.body).to.not.have.property("data");
-          expect(res.body).to.have.property("err");
-          User.all().then(users => {
-            expect(users).to.have.length(1);
-            done();
-          });
+      User.create({ name: "Tony" })
+        .then(() => {
+          let user = { name: 'Tony' };
+          chai.request(server)
+            .post('/api/users')
+            .set('Content-Type', 'application/json')
+            .send(user)
+            .end((err, res) => {
+              expect(res).to.have.status(200);
+              expect(res.body).to.be.an("object");
+              expect(res.body).to.not.have.property("data");
+              expect(res.body).to.have.property("err");
+              User.all().then(users => {
+                expect(users).to.have.length(1);
+                done();
+              });
+            });
         });
     });
-  });
-
-  describe('findByName', () => {
-    before(() => User.create({ name: "Tony" }));
-    after(() => User.sync({ force: true }));
-
-    it('should find existing user', done => {
-      chai.request(server)
-        .get(`/api/users/Tony`)
-        .end((err, res) => {
-          expect(res).to.have.status(200);
-          expect(res.body).to.be.an("object");
-          expect(res.body).to.not.have.property("err");
-          expect(res.body).to.have.property("data");
-          expect(res.body.data).to.have.property("name");
-          expect(res.body.data.name).to.equal("Tony");
-          expect(res.body.data.id).to.equal(1);
-          done();
-        });
-    });
-
-    it('should not find not existing user', done => {
-      chai.request(server)
-        .get(`/api/users/Bruce`)
-        .end((err, res) => {
-          expect(res).to.have.status(200);
-          expect(res.body).to.be.an("object");
-          expect(res.body).to.have.property("err");
-          expect(res.body).to.not.have.property("data");
-          done();
-        });
-    });
-
   });
 
   describe('update', () => {
-    beforeEach(() => User.create({ name: "Tony" }));
-    afterEach(() => User.sync({ force: true }));
+    before(() => User.create({ name: "Tony" }));
+    after(() => sequelize.truncate({ restartIdentity: true, cascade: true }));
 
     it('should update existing user', done => {
       chai.request(server)
@@ -174,7 +181,7 @@ describe('Users', () => {
 
   describe('destroy', () => {
     beforeEach(() => User.create({ name: "Tony" }));
-    afterEach(() => User.sync({ force: true }));
+    afterEach(() => sequelize.truncate({ restartIdentity: true, cascade: true }));
 
     it('should delete existing user', done => {
       chai.request(server)
