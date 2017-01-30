@@ -1,7 +1,6 @@
 <div *ngIf="currentUser" class="container">
-  <div class="row justify-content-end">
-    <div class="col-xs-4">
-      <div class="dropdown">
+  <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+      <div class="btn-group" role="group">
         <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           Filter by answers
         </button>
@@ -13,19 +12,12 @@
           <a class="dropdown-item" (click)="filter('unanswered')" role="button">Unanswered</a>
         </div>
       </div>
-    </div>
-    <div class="col-xs-4">
-      <div class="btn-group" data-toggle="buttons">
-        <label class="btn btn-primary active">
-          <input type="checkbox" checked autocomplete="off">Show only my questions
-        </label>
-      </div>
-    </div>
-    <div class="col-xs-4">
-      <button class="btn btn-primary">
+      <button type="button" class="btn btn-secondary" data-toggle="button" aria-pressed="false" autocomplete="off">
+        Show only my questions
+      </button>
+      <button class="btn btn-secondary">
         New question
       </button>
-    </div>
   </div>
 
   <ul class="list-group" id="questions">

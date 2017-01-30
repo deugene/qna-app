@@ -15,13 +15,17 @@ import { AppComponent } from './app.component';
 import { QuestionsComponent } from './questions/questions/questions.component';
 import { HomeComponent } from './static-pages/home/home.component';
 import { DialogComponent } from './dialog/dialog.component';
+import { QuestionSingleComponent } from './questions/question-single/question-single.component';
+import { QuestionFormComponent } from './questions/question-form/question-form.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     QuestionsComponent,
     HomeComponent,
-    DialogComponent
+    DialogComponent,
+    QuestionSingleComponent,
+    QuestionFormComponent
   ],
   imports: [
     BrowserModule,
