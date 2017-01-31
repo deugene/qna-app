@@ -8,7 +8,6 @@ import { UsersService } from '../../services/users.service';
 
 import { Answer } from '../../classes/answer';
 import { Question } from '../../classes/question';
-import { User } from '../../classes/user';
 
 import 'rxjs/add/operator/switchMap';
 
@@ -19,7 +18,9 @@ import 'rxjs/add/operator/switchMap';
 })
 export class QuestionSingleComponent implements OnInit {
   question: Question;
-  currentUser: User;
+  currentUserId: number;
+  isCurrent: boolean;
+  edit = false;
 
   constructor(
     private questionsService: QuestionsService,
@@ -29,18 +30,33 @@ export class QuestionSingleComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    this.currentUserId = JSON.parse(localStorage.getItem('currentUser')).id;
     this.route.params
       .switchMap((params: Params) => {
         return this.questionsService.findById(+params[ 'questionId' ]);
       })
-      .subscribe(question => this.question = question)
+      .subscribe(question => {
+        this.question = question;
+        this.isCurrent = this.question.author.id === this.currentUserId;
+      });
   }
 
   postedAt(date: string): string {
     const time = new Date(date).toTimeString().slice(0, 9);
     date = new Date(date).toDateString();
     return time + ' ' + date;
+  }
+
+  refresh() {
+    this.questionsService.findById(this.question.id)
+      .then(question => {
+        this.question = question;
+        this.edit = false;
+      });
+  }
+
+  goBack() {
+    this.location.back();
   }
 
 }

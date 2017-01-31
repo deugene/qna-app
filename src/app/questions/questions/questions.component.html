@@ -1,8 +1,5 @@
-<div *ngIf="currentUser" class="container pt-4">
-  <app-question-form [mode]="'create'"
-                     (questionsChange)="all()">
-
-  </app-question-form>
+<div *ngIf="currentUserId" class="container pt-4">
+  <app-question-form (questionsChange)="all()"></app-question-form>
 
   <div class="btn-group pb-2" role="group" aria-label="Button group with nested dropdown">
       <div class="btn-group" role="group">
@@ -37,9 +34,6 @@
               autocomplete="off">
         Show only my questions
       </button>
-      <button class="btn btn-secondary">
-        Ask Question
-      </button>
   </div>
 
   <div *ngIf="questions">
@@ -49,10 +43,13 @@
           routerLink="/questions/{{question.id}}">
         <div class="d-flex w-100 justify-content-between">
           <h5 class="mb-1">{{question.title}}</h5>
-          <small class="text-muted">posted at {{postedAt(question.createdAt)}}</small>
+          <small class="text-muted">author: {{question.author.name}}</small>
         </div>
         <p class="mb-1">{{question.body}}</p>
-        <small class="text-muted">author: {{question.author.name}}</small>
+        <div class="d-flex w-100 justify-content-between">
+          <small>{{answersCount(question)}}</small>
+          <small class="text-muted">posted at {{postedAt(question.createdAt)}}</small>
+        </div>
       </a>
     </div>
 

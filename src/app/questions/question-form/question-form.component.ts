@@ -13,7 +13,6 @@ import { QuestionsService, QuestionSearchOpts } from '../../services/questions.s
 })
 export class QuestionFormComponent implements OnInit, AfterViewChecked {
   userId: number;
-  @Input() mode: string;
   @Input() question: Question = new Question('', '');
 
   @Output() questionsChange = new EventEmitter<boolean>();
@@ -88,29 +87,29 @@ export class QuestionFormComponent implements OnInit, AfterViewChecked {
   onSubmit(): void {
     if (this.questionForm.form.valid) {
       new Promise(res => {
-        switch (this.mode) {
-          case 'create':
-            res(this.questionsService.create(this.question));
-            break;
-          case 'update':
-            const updates = {
-              title: this.question.title,
-              body: this.question.body
-            };
-            res(this.questionsService.update(this.question.id, updates));
-            break;
-          default:
-            throw new Error('Unknown Mode');
+        if (!this.question.id) {
+          res(this.questionsService.create(this.question));
+          return;
         }
+        const updates = {
+          title: this.question.title,
+          body: this.question.body
+        };
+        res(this.questionsService.update(this.question.id, updates));
       })
         .then(() => {
-          this.questionForm.reset();
           this.questionsChange.emit();
+          this.questionForm.reset();
         })
         .catch(err => {
           if (err) { console.error(err.message); }
         });
     }
+  }
+
+  back() {
+    this.questionsChange.emit();
+    this.questionForm.reset();
   }
 
 // TODO: remove later

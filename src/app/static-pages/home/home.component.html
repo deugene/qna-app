@@ -1,17 +1,26 @@
-<h5>
-  {{ title }}
-</h5>
 
-<form class="form-inline" #nameForm="ngForm" (ngSubmit)="onSubmit()">
-  <label class="sr-only" for="name">Name</label>
-  <input type="text"
-         class="form-control mb-2 mr-sm-2 mb-sm-0"
-         id="name"
-         placeholder="Name"
-         [(ngModel)]="name"
-         name="name"
-         required
-         pattern=".{3,50}">
+<div class="cover bg-secondary text-center my-5">
+    <div class="container">
+      <div class="row">
+          <div class="col-lg-12">
+            <h4 class="display-4">{{title}}</h4>
+            <p class="lead">{{subtitle}}</p>
+            <div class="row justify-content-center">
+              <form class="form-inline" #nameForm="ngForm" (ngSubmit)="onSubmit()">
+                <label class="sr-only" for="name">Name</label>
+                <input type="text"
+                      class="form-control mb-2 mr-sm-2 mb-sm-0"
+                      id="name"
+                      placeholder="Name"
+                      [(ngModel)]="name"
+                      name="name"
+                      required
+                      pattern=".{3,50}">
 
-  <button type="submit" class="btn btn-primary">Submit</button>
-</form>
+                <button type="submit" class="btn btn-secondary">Submit</button>
+              </form>
+            </div>
+          </div>
+      </div>
+    </div>
+</div>

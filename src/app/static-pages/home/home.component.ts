@@ -13,7 +13,8 @@ import { User } from '../../classes/user';
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit, AfterViewChecked {
-  title = 'Welcome to the QnA App! Please enter your name to start!';
+  title = 'Welcome to the QnA App!';
+  subtitle = 'Please enter your name to log in!';
   name = '';
   submitDisabled = true;
 
@@ -90,7 +91,7 @@ export class HomeComponent implements OnInit, AfterViewChecked {
         })
         .then(user => {
           if (user) {
-            localStorage.setItem('currentUserId', user.id.toString());
+            localStorage.setItem('currentUser', JSON.stringify(user));
             this.router.navigate([ 'questions' ]);
           }
         });

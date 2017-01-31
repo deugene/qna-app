@@ -11,7 +11,7 @@ import { QuestionsService, QuestionSearchOpts } from '../../services/questions.s
   styleUrls: ['./questions.component.css']
 })
 export class QuestionsComponent implements OnInit {
-  currentUser: User;
+  currentUserId: number;
   questions: Question[];
   showDropdown = false;
   showOnlyCurrentUserQuestions = false;
@@ -28,13 +28,13 @@ export class QuestionsComponent implements OnInit {
   constructor(private questionsService: QuestionsService) { }
 
   ngOnInit() {
-    this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    this.currentUserId = JSON.parse(localStorage.getItem('currentUser')).id;
     this.all();
   }
 
   all() {
     this.searchOpts.userId = this.showOnlyCurrentUserQuestions
-      ? this.currentUser.id
+      ? this.currentUserId
       : null;
     this.questionsService.all(this.searchOpts)
       .then(result => {
@@ -59,5 +59,8 @@ export class QuestionsComponent implements OnInit {
     this.all();
   }
 
+  answersCount(question: Question): string {
+    return (question.answers ? question.answers.length : 0) + ' answers';
+  }
 
 }
