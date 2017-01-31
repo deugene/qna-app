@@ -6,20 +6,32 @@
         <input type="text"
                class="form-control"
                id="title"
-               placeholder="title"
-               [(ngModel)]="name"
+               placeholder="Title"
+               [(ngModel)]="question.title"
                name="title"
                required
                pattern=".{3,100}">
       </div>
     </div>
     <div class="form-group row">
-      <textarea rows="10" class="form-control" id="body" name="body"></textarea>
+      <textarea rows="3"
+                class="form-control"
+                id="body"
+                [(ngModel)]="question.body"
+                name="body"
+                required
+                minlength="3"
+                maxlength="5000">
+      </textarea>
     </div>
     <div class="form-group row">
-      <div class="offset-sm-2 col-sm-10">
-        <button type="submit" class="btn btn-primary">Post Question</button>
-      </div>
+      <button type="submit"
+              class="btn btn-primary"
+              [class.disabled]="submitDisabled">
+        Post Question
+      </button>
     </div>
+    <!--TODO: remove later-->
+    <pre> {{test()}} </pre>
   </form>
 </div>

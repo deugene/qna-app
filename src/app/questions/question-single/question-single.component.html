@@ -1,3 +1,36 @@
-<p>
-  question-single works!
-</p>
+<div *ngIf="question" class="container py-5">
+  <div id="question">
+    <h3>{{question.title}}</h3>
+    <hr/>
+    <p class="lead">{{question.body}}</p>
+    <hr/>
+    <div class="d-flex w-100 justify-content-between">
+      <small class="text-muted">author: {{question.author.name}}</small>
+      <small class="text-muted">posted at {{postedAt(question.createdAt)}}</small>
+    </div>
+
+    <div id="buttons">
+      <a class="btn btn-secondary" (click)="goBack()">Back</a>
+      <a *ngIf="isCurrent || currentUser.admin"
+          routerLink="/users/{{user.id}}/edit"
+          class="btn btn-primary text-white">
+        Edit
+      </a>
+      <a *ngIf="currentUser.admin"
+          class="btn btn-outline-danger text-danger"
+          (click)="delete(user.id); $event.stopPropagation()">
+        Delete
+      </a>
+      <a *ngIf="!isCurrent && !isFollow"
+          (click)="follow()"
+          class="btn btn-primary text-white">
+        Answer
+      </a>
+    </div>
+
+  </div>
+
+  <div id="answers">
+
+  </div>
+</div>

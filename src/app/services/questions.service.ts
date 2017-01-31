@@ -28,7 +28,7 @@ export class QuestionsService {
   all(searchOpts: QuestionSearchOpts): Promise<PaginationResult> {
     return this.http
       .post(
-        `api/questions`,
+        `api/questions/all`,
         JSON.stringify(searchOpts),
         { headers: this.headers }
       )
@@ -36,7 +36,7 @@ export class QuestionsService {
       .then(res => {
         const result = res.json();
         if (result.err) { throw result.err; }
-        return result.data as PaginationResult;
+        return result as PaginationResult;
       })
       .catch(this.errorHandler);
   }

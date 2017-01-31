@@ -12,6 +12,7 @@ module.exports = {
     let opts = {
       offset: req.body.offset,
       limit: req.body.limit,
+      order: [[ 'id', 'DESC' ]],
       include: [ { model: User, as: 'author' } ]
     };
     const userId = req.body.userId;
@@ -34,7 +35,6 @@ module.exports = {
           const notAnsweredQuestions = questions.filter(q => {
             return q.answers.length === 0;
           });
-          console.log(notAnsweredQuestions);
           res.json({
             count: notAnsweredQuestions.length,
             data: notAnsweredQuestions.slice(
@@ -71,10 +71,8 @@ module.exports = {
   findById(req, res, next) {
     Question.findById(req.params.questionId, {
       include: [
-        {
-          model: Answer,
-          as: 'answers'
-        }
+        { model: Answer, as: 'answers' },
+        { model: User, as: 'author' }
       ]
     })
       .then(question => {

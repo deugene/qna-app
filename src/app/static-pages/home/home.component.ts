@@ -90,7 +90,7 @@ export class HomeComponent implements OnInit, AfterViewChecked {
         })
         .then(user => {
           if (user) {
-            localStorage.setItem('currentUser', JSON.stringify(user));
+            localStorage.setItem('currentUserId', user.id.toString());
             this.router.navigate([ 'questions' ]);
           }
         });
