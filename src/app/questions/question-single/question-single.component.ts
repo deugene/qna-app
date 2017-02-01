@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Location } from '@angular/common';
 
@@ -10,35 +10,48 @@ import { Answer } from '../../classes/answer';
 import { Question } from '../../classes/question';
 
 import 'rxjs/add/operator/switchMap';
+import { Subscription } from 'rxjs/Subscription';
+
 
 @Component({
   selector: 'app-question-single',
   templateUrl: './question-single.component.html',
   styleUrls: ['./question-single.component.css']
 })
-export class QuestionSingleComponent implements OnInit {
+export class QuestionSingleComponent implements OnInit, OnDestroy {
   question: Question;
   currentUserId: number;
   isCurrent: boolean;
   edit = false;
+  subscription: Subscription;
+
 
   constructor(
-    private questionsService: QuestionsService,
-    private answersService: AnswersService,
-    private route: ActivatedRoute,
-    private location: Location
+    private _questionsService: QuestionsService,
+    private _answersService: AnswersService,
+    private _route: ActivatedRoute,
+    private _location: Location,
+    private _usersService: UsersService
   ) { }
 
   ngOnInit() {
-    this.currentUserId = JSON.parse(localStorage.getItem('currentUser')).id;
-    this.route.params
-      .switchMap((params: Params) => {
-        return this.questionsService.findById(+params[ 'questionId' ]);
-      })
-      .subscribe(question => {
-        this.question = question;
-        this.isCurrent = this.question.author.id === this.currentUserId;
+    this.subscription = this._usersService.currentUser$
+      .subscribe(currentUser => {
+        if (currentUser) { this.currentUserId = currentUser.id; }
+        this._route.params
+          .switchMap((params: Params) => {
+            return this._questionsService.findById(+params[ 'questionId' ]);
+          })
+          .subscribe(question => {
+            this.question = question;
+            this._questionsService.setCurrentQuestion(this.question);
+            this.isCurrent = this.question.author.id === this.currentUserId;
+          });
       });
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
   }
 
   postedAt(date: string): string {
@@ -48,7 +61,7 @@ export class QuestionSingleComponent implements OnInit {
   }
 
   refresh() {
-    this.questionsService.findById(this.question.id)
+    this._questionsService.findById(this.question.id)
       .then(question => {
         this.question = question;
         this.edit = false;
@@ -56,7 +69,7 @@ export class QuestionSingleComponent implements OnInit {
   }
 
   goBack() {
-    this.location.back();
+    this._location.back();
   }
 
 }

@@ -14,7 +14,7 @@ import {
 } from '../../services/questions.service';
 
 class MockQuestionsService {
-  private questions = [
+  private _questions = [
     new Question('lorem0', 'lorem0', 1, [ ]              , 1, 'today', 'today'),
     new Question('lorem1', 'lorem1', 1, [ { body: '1' } ], 2, 'today', 'today'),
     new Question('lorem2', 'lorem2', 2, [ { body: '1' } ], 3, 'today', 'today'),
@@ -24,7 +24,7 @@ class MockQuestionsService {
   ];
 
   all(searchOpts: QuestionSearchOpts): Promise<PaginationResult> {
-    let res = this.questions;
+    let res = this._questions;
     if (searchOpts.userId) {
       res = res.filter(q => q.userId === searchOpts.userId);
     }

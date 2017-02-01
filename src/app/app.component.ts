@@ -1,26 +1,37 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { UsersService } from './services/users.service';
+import { User } from './classes/user';
+
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   title = 'Q&A App';
+  currentUser: User;
+  subscription: Subscription;
 
   constructor(
-    public usersService: UsersService,
-    private router: Router
+    private _usersService: UsersService,
+    private _router: Router
   ) { }
 
   ngOnInit() {
+    this.subscription = this._usersService.currentUser$
+      .subscribe(currentUser => this.currentUser = currentUser);
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
   }
 
   changeUser() {
-    this.usersService.changeUser()
-      .then(() => this.router.navigate([ 'home' ]));
+    this._usersService.changeUser()
+      .then(() => this._router.navigate([ 'home' ]));
   }
 }

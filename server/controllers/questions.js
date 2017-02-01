@@ -13,7 +13,10 @@ module.exports = {
       offset: req.body.offset,
       limit: req.body.limit,
       order: [[ 'id', 'DESC' ]],
-      include: [ { model: User, as: 'author' } ]
+      include: [
+        { model: Answer, as: 'answers', attributes: [ 'id' ] },
+        { model: User, as: 'author' }
+      ]
     };
     const userId = req.body.userId;
     if (userId) {
@@ -21,15 +24,13 @@ module.exports = {
     }
     const status = req.body.status;
 
-    // update find optinos, find and send questions if unanswered questions are
-    // needed
+    // update find options if answered questions are needed
+    if (status && status === 'answered') {
+      opts.include[0].where = { questionId: { $ne: null } };
+    }
+
+    // find and send unanswered questions if they are needed
     if (status && status === 'unanswered') {
-      opts.include.push({
-        model: Answer,
-        as: 'answers',
-        required: false,
-        attributes: [ 'id' ]
-      });
       Question.findAll(opts)
         .then(questions => {
           const notAnsweredQuestions = questions.filter(q => {
@@ -43,19 +44,10 @@ module.exports = {
             )
           });
         });
+
+    // else search and send questions that match opts
     } else {
-
-      // update find options if answered questions are needed
-      if (status && status === 'answered') {
-        opts.include.push({
-          model: Answer,
-          where: { questionId: { $ne: null } },
-          attributes: [ 'id' ],
-          as: 'answers'
-        });
-      }
-
-      Question.findAndCount(opts)
+      Question.findAndCountAll(opts)
         .then(result => {
 
           // send questions

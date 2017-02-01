@@ -1,13 +1,16 @@
 'use strict';
 
-const Answer = require('../models').Answer;
+const models = require('../models');
+const Answer = models.Answer;
+const User = models.User;
 
 module.exports = {
   findAllByQuestionId(req, res, next) {
-    Answer.findAndCount({
+    Answer.findAndCountAll({
       offset: req.body.offset,
       limit: req.body.limit,
-      where: { questionId: req.params.questionId }
+      where: { questionId: req.params.questionId },
+      include: [ { model: User, as: 'author' } ]
     })
       .then(result => {
         res.json({

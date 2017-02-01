@@ -1,19 +1,24 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 
 import { User } from '../../classes/user';
 import { Question } from '../../classes/question';
 
-import { QuestionsService, QuestionSearchOpts } from '../../services/questions.service';
+import {
+  QuestionsService, QuestionSearchOpts
+} from '../../services/questions.service';
+import { UsersService } from '../../services/users.service';
+
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
   selector: 'app-questions',
   templateUrl: './questions.component.html',
   styleUrls: ['./questions.component.css']
 })
-export class QuestionsComponent implements OnInit {
+export class QuestionsComponent implements OnInit, OnDestroy {
   currentUserId: number;
   questions: Question[];
-  showDropdown = false;
+  subscription: Subscription;
   showOnlyCurrentUserQuestions = false;
 
   // pagination
@@ -25,18 +30,30 @@ export class QuestionsComponent implements OnInit {
     limit: 10
   };
 
-  constructor(private questionsService: QuestionsService) { }
+  constructor(
+    private _questionsService: QuestionsService,
+    private _usersService: UsersService
+  ) { }
 
   ngOnInit() {
-    this.currentUserId = JSON.parse(localStorage.getItem('currentUser')).id;
-    this.all();
+    this.subscription = this._usersService.currentUser$
+      .subscribe(currentUser => {
+        if (currentUser) {
+          this.currentUserId = currentUser.id;
+          this.all();
+        }
+      });
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
   }
 
   all() {
     this.searchOpts.userId = this.showOnlyCurrentUserQuestions
       ? this.currentUserId
       : null;
-    this.questionsService.all(this.searchOpts)
+    this._questionsService.all(this.searchOpts)
       .then(result => {
         this.questions = result.count ? result.data : null;
         this.totalItems = result.count;
@@ -61,6 +78,12 @@ export class QuestionsComponent implements OnInit {
 
   answersCount(question: Question): string {
     return (question.answers ? question.answers.length : 0) + ' answers';
+  }
+
+  pageChanged(newPage: number): void {
+    this.searchOpts.offset = (newPage - 1) * this.searchOpts.limit;
+    this.currentPage = newPage;
+    this.all();
   }
 
 }

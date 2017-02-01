@@ -1,0 +1,22 @@
+<div *ngIf="answers && answers.length" class="py-4">
+
+  <h5>Answers:</h5>
+  <div class="list-group pb-2">
+    <li *ngFor="let answer of answers | paginate: { id: 'answers', itemsPerPage: searchOpts.limit, currentPage: currentPage, totalItems: totalItems }"
+        class="list-group-item flex-column align-items-start">
+      <div class="d-flex w-100 justify-content-between">
+        <h5 class="mb-1">{{answer.title}}</h5>
+      </div>
+      <p class="mb-1">{{answer.body}}</p>
+      <div class="d-flex w-100 justify-content-between">
+        <small>author: {{answer.author.name}}</small>
+        <small class="text-muted">posted at {{postedAt(answer.createdAt)}}</small>
+      </div>
+    </li>
+  </div>
+
+  <pagination-controls id="answers" (pageChange)="pageChanged($event)"></pagination-controls>
+
+</div>
+
+<app-answer-form (answersChange)="findAllByQuestionId()"></app-answer-form>

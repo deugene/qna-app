@@ -10,7 +10,7 @@
         <small class="text-muted">posted at {{postedAt(question.createdAt)}}</small>
       </div>
 
-      <div id="buttons">
+      <div id="buttons" class="my-3">
         <a class="btn btn-secondary" role="button" (click)="goBack()">Back</a>
         <a *ngIf="isCurrent"
             (click)="edit = true"
@@ -24,17 +24,13 @@
             (click)="delete(question.id)">
           Delete
         </a>
-        <a *ngIf="!isCurrent"
-            role="button"
-            class="btn btn-primary text-white">
-          Answer
-        </a>
       </div>
+      <hr/>
 
     </div>
 
     <div id="answers">
-
+      <app-answers [questionId]="question.id"></app-answers>
     </div>
   </div>
   <div *ngIf="edit">

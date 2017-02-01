@@ -17,6 +17,8 @@ import { HomeComponent } from './static-pages/home/home.component';
 import { DialogComponent } from './dialog/dialog.component';
 import { QuestionSingleComponent } from './questions/question-single/question-single.component';
 import { QuestionFormComponent } from './questions/question-form/question-form.component';
+import { AnswerFormComponent } from './answers/answer-form/answer-form.component';
+import { AnswersComponent } from './answers/answers/answers.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +27,9 @@ import { QuestionFormComponent } from './questions/question-form/question-form.c
     HomeComponent,
     DialogComponent,
     QuestionSingleComponent,
-    QuestionFormComponent
+    QuestionFormComponent,
+    AnswerFormComponent,
+    AnswersComponent
   ],
   imports: [
     BrowserModule,

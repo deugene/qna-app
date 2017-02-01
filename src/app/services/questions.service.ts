@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Headers, Http } from '@angular/http';
 
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+
 import { Question } from '../classes/question';
 
 import 'rxjs/add/operator/toPromise';
@@ -19,18 +21,25 @@ export interface QuestionSearchOpts {
 
 @Injectable()
 export class QuestionsService {
-  private headers = new Headers({ 'Content-Type': 'application/json' });
+  private _headers = new Headers({ 'Content-Type': 'application/json' });
 
-  constructor(private http: Http) { }
+  private _currentQuestion = new BehaviorSubject<Question>(null);
+  currentQuestion$ = this._currentQuestion.asObservable();
+
+  constructor(private _http: Http) { }
+
+  setCurrentQuestion(question: Question) {
+    this._currentQuestion.next(question);
+  }
 
   // api interface
 
   all(searchOpts: QuestionSearchOpts): Promise<PaginationResult> {
-    return this.http
+    return this._http
       .post(
         `api/questions/all`,
         JSON.stringify(searchOpts),
-        { headers: this.headers }
+        { headers: this._headers }
       )
       .toPromise()
       .then(res => {
@@ -42,7 +51,7 @@ export class QuestionsService {
   }
 
   findById(id: number): Promise<Question> {
-    return this.http
+    return this._http
       .get(`api/questions/${id}`)
       .toPromise()
       .then(res => {
@@ -58,8 +67,8 @@ export class QuestionsService {
   }
 
   create(question: Question): Promise<Question> {
-    return this.http
-      .post(`api/questions`, JSON.stringify(question), { headers: this.headers })
+    return this._http
+      .post(`api/questions`, JSON.stringify(question), { headers: this._headers })
       .toPromise()
       .then(res => {
         const result = res.json();
@@ -70,8 +79,8 @@ export class QuestionsService {
   }
 
   update(id: number, updates: any): Promise<Question> {
-    return this.http
-      .put(`api/questions/${id}`, JSON.stringify(updates), { headers: this.headers })
+    return this._http
+      .put(`api/questions/${id}`, JSON.stringify(updates), { headers: this._headers })
       .toPromise()
       .then(res => {
         const result = res.json();
@@ -82,7 +91,7 @@ export class QuestionsService {
   }
 
   destroy(id: number): Promise<Question> {
-    return this.http
+    return this._http
       .delete(`api/questions/${id}`)
       .toPromise()
       .then(res => {

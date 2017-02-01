@@ -1,23 +1,10 @@
-<div class="container py-4">
-  <form #questionForm="ngForm" (ngSubmit)="onSubmit()">
-    <div class="form-group row">
-      <input type="text"
-              class="form-control"
-              id="title"
-              placeholder="Title"
-              [(ngModel)]="question.title"
-              name="title"
-              required
-              pattern=".{3,100}">
-    </div>
-    <div *ngIf="formErrors.title" class="alert alert-danger">
-      {{formErrors.title}}
-    </div>
+<div class="container py-2">
+  <form #answerForm="ngForm" (ngSubmit)="onSubmit()">
     <div class="form-group row">
       <textarea rows="3"
                 class="form-control"
                 id="body"
-                [(ngModel)]="question.body"
+                [(ngModel)]="answer.body"
                 name="body"
                 required
                 minlength="3"
@@ -29,7 +16,7 @@
     </div>
     <div class="form-group row">
       <div class="btn-block">
-        <button *ngIf="question.id"
+        <button *ngIf="answer.id"
                 class="btn btn-secondary"
                 (click)="back()">
           Back
@@ -37,7 +24,7 @@
         <button type="submit"
                 class="btn btn-primary"
                 [class.disabled]="submitDisabled">
-          {{question.id ? 'Save' : 'Ask Question'}}
+          {{answer.id ? 'Save' : 'Answer this question'}}
         </button>
       </div>
     </div>

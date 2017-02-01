@@ -25,7 +25,7 @@ export class HomeComponent implements OnInit, AfterViewChecked {
   validationMessages = {
     'name': {
       'required': 'Name is required.',
-      'pattern': 'First Name must contain at least 3 and less than 51 characters',
+      'pattern': 'First Name must contain at least 3 and less than 51 characters.'
     }
   };
 
@@ -33,8 +33,8 @@ export class HomeComponent implements OnInit, AfterViewChecked {
   @ViewChild('nameForm') currentForm: NgForm;
 
   constructor(
-    private usersService: UsersService,
-    private router: Router
+    private _usersService: UsersService,
+    private _router: Router
   ) { }
 
   ngOnInit() {
@@ -79,11 +79,11 @@ export class HomeComponent implements OnInit, AfterViewChecked {
 
   onSubmit(): void {
     if (this.nameForm.form.valid) {
-      this.usersService.findByName(this.name)
+      this._usersService.findByName(this.name)
         .then(user => {
           if (!user) {
             if (confirm('User Not Found. Create new user?')) {
-              return this.usersService.create(new User(this.name));
+              return this._usersService.create(new User(this.name));
             }
             return null;
           }
@@ -92,7 +92,8 @@ export class HomeComponent implements OnInit, AfterViewChecked {
         .then(user => {
           if (user) {
             localStorage.setItem('currentUser', JSON.stringify(user));
-            this.router.navigate([ 'questions' ]);
+            this._usersService.setCurrentUser(user);
+            this._router.navigate([ 'questions' ]);
           }
         });
     }

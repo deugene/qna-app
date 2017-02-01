@@ -1,18 +1,25 @@
 import {
-  Component, OnInit, Input, Output, ViewChild, AfterViewChecked, EventEmitter
+  Component, OnInit, Input, Output, ViewChild, AfterViewChecked, EventEmitter,
+  OnDestroy
 } from '@angular/core';
 import { NgForm } from '@angular/forms';
 
 import { Question } from '../../classes/question';
-import { QuestionsService, QuestionSearchOpts } from '../../services/questions.service';
+import {
+  QuestionsService, QuestionSearchOpts
+} from '../../services/questions.service';
+import { UsersService } from '../../services/users.service';
+
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
   selector: 'app-question-form',
   templateUrl: './question-form.component.html',
   styleUrls: ['./question-form.component.css']
 })
-export class QuestionFormComponent implements OnInit, AfterViewChecked {
+export class QuestionFormComponent implements OnInit, AfterViewChecked, OnDestroy {
   userId: number;
+  subscription: Subscription;
   @Input() question: Question = new Question('', '');
 
   @Output() questionsChange = new EventEmitter<boolean>();
@@ -30,21 +37,31 @@ export class QuestionFormComponent implements OnInit, AfterViewChecked {
   validationMessages = {
     'body': {
       'required': 'Content is required.',
-      'minlength': 'Question must contain at least 3 characters',
-      'maxlength': 'Question must contain less than 5001 characters'
+      'minlength': 'Question must contain at least 3 characters.',
+      'maxlength': 'Question must contain less than 5001 characters.'
     },
     'title': {
       'required': 'Content is required.',
-      'pattern': 'Title must contain at least 3 and less than 101 characters'
+      'pattern': 'Title must contain at least 3 and less than 101 characters.'
     }
   };
 
-  constructor(private questionsService: QuestionsService) { }
+  constructor(
+    private _questionsService: QuestionsService,
+    private _usersService: UsersService
+  ) { }
 
   ngOnInit() {
     if (!this.question.userId) {
-      this.question.userId = JSON.parse(localStorage.getItem('currentUser')).id;
+      this.subscription = this._usersService.currentUser$
+        .subscribe(currentUser => {
+          if (currentUser) { this.question.userId = currentUser.id; }
+        });
     }
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
   }
 
   ngAfterViewChecked() {
@@ -88,14 +105,14 @@ export class QuestionFormComponent implements OnInit, AfterViewChecked {
     if (this.questionForm.form.valid) {
       new Promise(res => {
         if (!this.question.id) {
-          res(this.questionsService.create(this.question));
+          res(this._questionsService.create(this.question));
           return;
         }
         const updates = {
           title: this.question.title,
           body: this.question.body
         };
-        res(this.questionsService.update(this.question.id, updates));
+        res(this._questionsService.update(this.question.id, updates));
       })
         .then(() => {
           this.questionsChange.emit();
@@ -110,11 +127,6 @@ export class QuestionFormComponent implements OnInit, AfterViewChecked {
   back() {
     this.questionsChange.emit();
     this.questionForm.reset();
-  }
-
-// TODO: remove later
-  test() {
-    return JSON.stringify(this.question);
   }
 
 }
