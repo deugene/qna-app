@@ -1,70 +1,58 @@
 /* tslint:disable:no-unused-variable */
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed, tick, fakeAsync } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
+import { Routes } from '@angular/router';
 import { By } from '@angular/platform-browser';
-import { DebugElement } from '@angular/core';
+import { DebugElement, Component, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 
 import { QuestionsComponent } from './questions.component';
-import { Question } from '../../classes/question';
-import { Answer } from '../../classes/answer';
+import { QuestionFormComponent } from '../question-form/question-form.component';
 
+import { UsersService } from '../../services/users.service';
 import {
   QuestionsService,
   PaginationResult,
   QuestionSearchOpts
 } from '../../services/questions.service';
 
-class MockQuestionsService {
-  private _questions = [
-    new Question('lorem0', 'lorem0', 1, [ ]              , 1, 'today', 'today'),
-    new Question('lorem1', 'lorem1', 1, [ { body: '1' } ], 2, 'today', 'today'),
-    new Question('lorem2', 'lorem2', 2, [ { body: '1' } ], 3, 'today', 'today'),
-    new Question('lorem3', 'lorem3', 2, [ { body: '1' } ], 4, 'today', 'today'),
-    new Question('lorem4', 'lorem4', 2, [ ]              , 5, 'today', 'today'),
-    new Question('lorem5', 'lorem5', 1, [ { body: '1' } ], 6, 'today', 'today'),
-  ];
+import {
+  UserServiceStub, QuestionsServiceStub
+} from '../../../testing/services-stubs';
 
-  all(searchOpts: QuestionSearchOpts): Promise<PaginationResult> {
-    let res = this._questions;
-    if (searchOpts.userId) {
-      res = res.filter(q => q.userId === searchOpts.userId);
-    }
-    if (searchOpts.status === 'answered') {
-      res = res.filter(q => q.answers.length > 0);
-    }
-    if (searchOpts.status === 'unnswered') {
-      res = res.filter(q => q.answers.length === 0);
-    }
+import { Ng2PaginationModule } from 'ng2-pagination';
 
-    return Promise.resolve({
-      count: res.length,
-      data: res.slice(searchOpts.offset, searchOpts.limit)
-    });
-  }
-  findById(id: number): Promise<Question> {
-    return Promise.resolve(new Question('lorem', 'lorem', 1, [], id));
-  }
-  create(question: Question): Promise<Question> {
-    return Promise.resolve(new Question('lorem', 'lorem'));
-  }
-  update(id: number, updates: Question): Promise<Question> {
-    const newQuestion = new Question('lorem', 'lorem');
-    Object.assign(newQuestion, updates);
-    return Promise.resolve(newQuestion);
-  }
-  destroy(id: number): Promise<Question> {
-    return Promise.resolve(new Question('lorem', 'lorem', 1, [], id));
-  }
+import { Question } from '../../models/question';
+import { Answer } from '../../models/answer';
+
+@Component({
+  template: ''
+})
+class DummyComponent {
 }
 
-fdescribe('QuestionsComponent', () => {
+const routes: Routes = [
+  { path: 'questions/:questionId', component: DummyComponent }
+];
+
+describe('QuestionsComponent', () => {
   let component: QuestionsComponent;
   let fixture: ComponentFixture<QuestionsComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ QuestionsComponent ],
+      imports: [
+        RouterTestingModule.withRoutes(routes),
+        Ng2PaginationModule
+      ],
+      schemas: [ CUSTOM_ELEMENTS_SCHEMA ],
+      declarations: [
+        QuestionsComponent,
+        DummyComponent
+      ],
       providers: [
-        { provide: QuestionsService, useClass: MockQuestionsService }
+        { provide: QuestionsService, useClass: QuestionsServiceStub },
+        { provide: UsersService, useClass: UserServiceStub }
       ]
     })
     .compileComponents();
@@ -80,9 +68,68 @@ fdescribe('QuestionsComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it(`should have as title 'Questions'`, async(() => {
-    const app = fixture.debugElement.componentInstance;
-    expect(app.title).toEqual('Questions');
+  it(`should have as title 'Questions:'`, async(() => {
+    const compiled = fixture.debugElement.componentInstance;
+    expect(compiled.title).toEqual('Questions:');
+  }));
+
+  it('should filter questions', fakeAsync(() => {
+    const compiled = fixture.debugElement.nativeElement;
+
+    component.ngOnInit();
+    tick();
+    fixture.detectChanges();
+
+    expect(compiled.textContent.includes('lorem0')).toBe(true);
+    expect(compiled.textContent.includes('lorem1')).toBe(true);
+    expect(compiled.textContent.includes('lorem2')).toBe(true);
+
+    const dropdown = compiled.querySelector('.dropdown-toggle');
+    expect(dropdown.textContent).toMatch('Filter by answers');
+    const all = compiled.querySelector('#allQuestions');
+    expect(all.textContent).toMatch('All');
+    const answered = compiled.querySelector('#answeredQuestions');
+    expect(answered.textContent).toMatch('Answered');
+    const unanswered = compiled.querySelector('#unansweredQuestions');
+    expect(unanswered.textContent).toMatch('Unanswered');
+    const button = compiled.querySelector('#onlyUsersQuestionsSwitch');
+    expect(button.textContent).toMatch('Show only my questions');
+
+    answered.click();
+    tick();
+    fixture.detectChanges();
+
+    expect(compiled.textContent.includes('lorem0')).toBe(false);
+    expect(compiled.textContent.includes('lorem1')).toBe(true);
+
+    unanswered.click();
+    tick();
+    fixture.detectChanges();
+
+    expect(compiled.textContent.includes('lorem0')).toBe(true);
+    expect(compiled.textContent.includes('lorem1')).toBe(false);
+
+    all.click();
+    tick();
+    fixture.detectChanges();
+
+    expect(compiled.textContent.includes('lorem0')).toBe(true);
+    expect(compiled.textContent.includes('lorem1')).toBe(true);
+    expect(compiled.textContent.includes('lorem2')).toBe(true);
+
+    button.click();
+    tick();
+    fixture.detectChanges();
+
+    expect(compiled.textContent.includes('lorem0')).toBe(true);
+    expect(compiled.textContent.includes('lorem2')).toBe(false);
+
+    button.click();
+    tick();
+    fixture.detectChanges();
+
+    expect(compiled.textContent.includes('lorem0')).toBe(true);
+    expect(compiled.textContent.includes('lorem2')).toBe(true);
   }));
 
   // it('should render title in a h1 tag', async(() => {
@@ -91,47 +138,5 @@ fdescribe('QuestionsComponent', () => {
   //   const compiled = fixture.debugElement.nativeElement;
   //   expect(compiled.querySelector('h1').textContent).toContain('app works!');
   // }));
-
-  it('should have bottons All, Answered and Unanswered', async(() => {
-    const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelector('#all').textContent).toMatch('All');
-    expect(compiled.querySelector('#answered').textContent).toMatch('Answered');
-    expect(compiled.querySelector('#unanswered').textContent).toMatch('Unanswered');
-    expect(compiled.querySelector('#myQuestions').textContent).toMatch('Show only my questions');
-    component.myOrAllUsersQuestionsSwitch();
-    expect(compiled.querySelector('#myQuestions')).toBeFalsy();
-    expect(compiled.querySelector('#allUsersQuestions').textContent).toMatch('Show only my questions');
-    component.myOrAllUsersQuestionsSwitch();
-    expect(compiled.querySelector('#allUsersQuestions')).toBeFalsy();
-    expect(compiled.querySelector('#myQuestions').textContent).toMatch('Show only my questions');
-  }));
-
-  describe('All, Answered and Unanswered buttons', () => {
-    it('should change questions content', async(() => {
-      component.ngOnInit();
-      const compiled = fixture.debugElement.nativeElement;
-      expect(compiled.querySelector('#all').classList.contains('active')).toBeTruthy();
-      expect(compiled.textContent).toContain('lorem0');
-      expect(compiled.textContent).toContain('lorem2');
-      const answeredSearchOpts: QuestionSearchOpts = {
-        offset: 0, limit: 10, status: 'answered'
-      };
-      component.all(answeredSearchOpts);
-      expect(compiled.textContent).toContain('lorem1');
-      expect(compiled.textContent.includes('lorem0')).toBe(false);
-      const unansweredSearchOpts: QuestionSearchOpts = {
-        offset: 0, limit: 10, status: 'unanswered'
-      };
-      component.all(unansweredSearchOpts);
-      expect(compiled.textContent).toContain('lorem0');
-      expect(compiled.textContent.includes('lorem1')).toBe(false);
-      component.all({ offset: 0, limit: 10 });
-      component.myOrAllUsersQuestionsSwitch();
-      expect(compiled.textContent).toContain('lorem0');
-      expect(compiled.textContent.includes('lorem1')).toBe(false);
-    }));
-  });
-
-
 
 });

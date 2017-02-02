@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 
-import { User } from '../../classes/user';
-import { Question } from '../../classes/question';
+import { User } from '../../models/user';
+import { Question } from '../../models/question';
 
 import {
   QuestionsService, QuestionSearchOpts
@@ -16,6 +16,7 @@ import { Subscription } from 'rxjs/Subscription';
   styleUrls: ['./questions.component.css']
 })
 export class QuestionsComponent implements OnInit, OnDestroy {
+  title = 'Questions:';
   currentUserId: number;
   questions: Question[];
   subscription: Subscription;

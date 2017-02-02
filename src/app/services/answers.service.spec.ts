@@ -10,7 +10,7 @@ import { MockBackend, MockConnection } from '@angular/http/testing';
 import 'rxjs/add/operator/toPromise';
 
 import { AnswersService } from './answers.service';
-import { Answer } from '../classes/answer';
+import { Answer } from '../models/answer';
 
 describe('AnswersService', () => {
 
@@ -53,9 +53,10 @@ describe('AnswersService', () => {
             new Response(
               new ResponseOptions({
                 body: {
-                count: data.length,
-                body: data
-              }})
+                  count: data.length,
+                  body: data
+                }
+              })
             )
           );
         });

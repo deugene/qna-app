@@ -14,7 +14,6 @@ import { AppRoutingModule } from './app-routing/app-routing.module';
 import { AppComponent } from './app.component';
 import { QuestionsComponent } from './questions/questions/questions.component';
 import { HomeComponent } from './static-pages/home/home.component';
-import { DialogComponent } from './dialog/dialog.component';
 import { QuestionSingleComponent } from './questions/question-single/question-single.component';
 import { QuestionFormComponent } from './questions/question-form/question-form.component';
 import { AnswerFormComponent } from './answers/answer-form/answer-form.component';
@@ -25,7 +24,6 @@ import { AnswersComponent } from './answers/answers/answers.component';
     AppComponent,
     QuestionsComponent,
     HomeComponent,
-    DialogComponent,
     QuestionSingleComponent,
     QuestionFormComponent,
     AnswerFormComponent,

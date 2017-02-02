@@ -17,10 +17,15 @@
                       required
                       pattern=".{3,50}">
 
-                <button type="submit" class="btn btn-secondary">Submit</button>
+                <button type="submit"
+                        class="btn btn-secondary"
+                        [class.disabled]="submitDisabled"
+                        id="submit">
+                  Submit
+                </button>
               </form>
             </div>
-            <div *ngIf="formErrors.name" class="alert alert-danger my-1 mx-5">
+            <div *ngIf="formErrors.name" class="alert alert-danger my-1 mx-5" id="nameErrors">
               {{formErrors.name}}
             </div>
           </div>

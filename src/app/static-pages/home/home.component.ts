@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 
 import { UsersService } from '../../services/users.service';
 
-import { User } from '../../classes/user';
+import { User } from '../../models/user';
 
 @Component({
   selector: 'app-home',

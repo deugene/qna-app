@@ -38,15 +38,15 @@ describe('Questions', () => {
             User.create({ name: 'Bruce' })
           ])
             .then(() => {
-              return Question.create({ body: "lorem0", title: "lorem0", userId: 1 })
-                .then(() => Question.create({ body: "lorem1", title: "lorem1", userId: 2 }))
-                .then(() => Question.create({ body: "lorem2", title: "lorem2", userId: 1 }));
+              return Question.create({ id: 1, body: "lorem0", title: "lorem0", userId: 1 })
+                .then(() => Question.create({ id: 2, body: "lorem1", title: "lorem1", userId: 2 }))
+                .then(() => Question.create({ id: 3, body: "lorem2", title: "lorem2", userId: 1 }));
             });
         });
     });
     after(() => sequelize.truncate({ restartIdentity: true, cascade: true }));
 
-    it('should find all existing question', done => {
+    it('should find all existing question and sort descending by id', done => {
       const searchOpts = {
         offset: 0,
         limit: 10
@@ -63,7 +63,8 @@ describe('Questions', () => {
           expect(res.body.data).to.have.property("length");
           expect(res.body.data).to.have.length(3);
           expect(res.body.data[0]).to.have.property("body");
-          expect(res.body.data[0].body).to.equal("lorem0");
+          expect(res.body.data[0].body).to.equal("lorem2");
+          expect(res.body.data[2].body).to.equal("lorem0");
           expect(res.body.count).to.equal(3);
           done();
         });
@@ -87,7 +88,7 @@ describe('Questions', () => {
           expect(res.body.data).to.have.property("length");
           expect(res.body.data).to.have.length(2);
           expect(res.body.data[0]).to.have.property("body");
-          expect(res.body.data[1].body).to.equal("lorem2");
+          expect(res.body.data[0].body).to.equal("lorem2");
           expect(res.body.count).to.equal(2);
           done();
         });
@@ -107,7 +108,7 @@ describe('Questions', () => {
           expect(res.body.data).to.have.property("length");
           expect(res.body.data).to.have.length(2);
           expect(res.body.data[0]).to.have.property("body");
-          expect(res.body.data[0].body).to.equal("lorem0");
+          expect(res.body.data[0].body).to.equal("lorem2");
           expect(res.body.count).to.equal(3);
           searchOpts = { offset: 2, limit: 2 };
           chai.request(server)
@@ -122,7 +123,7 @@ describe('Questions', () => {
               expect(res.body.data).to.have.property("length");
               expect(res.body.data).to.have.length(1);
               expect(res.body.data[0]).to.have.property("body");
-              expect(res.body.data[0].body).to.equal("lorem2");
+              expect(res.body.data[0].body).to.equal("lorem0");
               expect(res.body.count).to.equal(3);
               done();
             });
@@ -130,7 +131,7 @@ describe('Questions', () => {
     });
 
     describe('answered questions', () => {
-      before(() => Answer.create({ body: 'lorem', questionId: 1, userId: 1}));
+      before(() => Answer.create({ id: 1, body: 'lorem', questionId: 2, userId: 1}));
       after(() => sequelize.truncate({ restartIdentity: true, cascade: true }));
 
       it('should find answered questions', done => {
@@ -151,7 +152,7 @@ describe('Questions', () => {
             expect(res.body.data).to.have.property("length");
             expect(res.body.data).to.have.length(1);
             expect(res.body.data[0]).to.have.property("body");
-            expect(res.body.data[0].body).to.equal("lorem0");
+            expect(res.body.data[0].body).to.equal("lorem1");
             expect(res.body.count).to.equal(1);
             done();
           });
@@ -175,7 +176,7 @@ describe('Questions', () => {
             expect(res.body.data).to.have.property("length");
             expect(res.body.data).to.have.length(2);
             expect(res.body.data[0]).to.have.property("body");
-            expect(res.body.data[0].body).to.equal("lorem1");
+            expect(res.body.data[0].body).to.equal("lorem2");
             expect(res.body.count).to.equal(2);
             done();
           });

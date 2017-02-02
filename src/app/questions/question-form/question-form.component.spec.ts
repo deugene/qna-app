@@ -2,6 +2,12 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+
+import { UsersService } from '../../services/users.service';
+import { QuestionsService } from '../../services/questions.service';
+
+import { UserServiceStub, QuestionsServiceStub } from '../../../testing/services-stubs';
 
 import { QuestionFormComponent } from './question-form.component';
 
@@ -11,7 +17,12 @@ describe('QuestionFormComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ QuestionFormComponent ]
+      declarations: [ QuestionFormComponent ],
+      imports: [ FormsModule ],
+      providers: [
+        { provide: UsersService, useClass: UserServiceStub },
+        { provide: QuestionsService, useClass: QuestionsServiceStub }
+      ]
     })
     .compileComponents();
   }));

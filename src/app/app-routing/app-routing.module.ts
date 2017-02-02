@@ -12,8 +12,7 @@ export const routes: Routes = [
   { path: 'home', component: HomeComponent },
   { path: 'questions/:questionId', component: QuestionSingleComponent },
   { path: 'questions/:questionId/edit', component: QuestionFormComponent }
-
-]
+];
 
 @NgModule({
   imports: [ RouterModule.forRoot(routes) ],

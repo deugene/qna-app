@@ -4,7 +4,7 @@ import {
 } from '@angular/core';
 import { NgForm } from '@angular/forms';
 
-import { Question } from '../../classes/question';
+import { Question } from '../../models/question';
 import {
   QuestionsService, QuestionSearchOpts
 } from '../../services/questions.service';

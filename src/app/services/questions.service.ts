@@ -3,7 +3,7 @@ import { Headers, Http } from '@angular/http';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
-import { Question } from '../classes/question';
+import { Question } from '../models/question';
 
 import 'rxjs/add/operator/toPromise';
 

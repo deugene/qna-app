@@ -1,20 +1,24 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 
-import { User } from '../../classes/user';
-import { Answer } from '../../classes/answer';
+import { Subscription } from 'rxjs/Subscription';
+
+import { User } from '../../models/user';
+import { Answer } from '../../models/answer';
 
 import { AnswersService } from '../../services/answers.service';
+import { UsersService } from '../../services/users.service';
 
 @Component({
   selector: 'app-answers',
   templateUrl: './answers.component.html',
   styleUrls: ['./answers.component.css']
 })
-export class AnswersComponent implements OnInit {
+export class AnswersComponent implements OnInit, OnDestroy {
   @Input() questionId: number;
   currentUserId: number;
   answers: Answer[];
   showOnlyCurrentUserAnswers = false;
+  subscription: Subscription;
 
   // pagination
   currentPage: number;
@@ -25,11 +29,23 @@ export class AnswersComponent implements OnInit {
     limit: 10
   };
 
-  constructor(private _answersService: AnswersService) { }
+  constructor(
+    private _answersService: AnswersService,
+    private _usersService: UsersService,
+  ) { }
 
   ngOnInit() {
-    this.currentUserId = JSON.parse(localStorage.getItem('currentUser')).id;
-    this.findAllByQuestionId();
+    this.subscription = this._usersService.currentUser$
+      .subscribe(currentUser => {
+        if (currentUser) {
+          this.currentUserId = currentUser.id;
+          this.findAllByQuestionId();
+        }
+      });
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
   }
 
   findAllByQuestionId() {

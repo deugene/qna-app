@@ -6,8 +6,8 @@ import { QuestionsService } from '../../services/questions.service';
 import { AnswersService } from '../../services/answers.service';
 import { UsersService } from '../../services/users.service';
 
-import { Answer } from '../../classes/answer';
-import { Question } from '../../classes/question';
+import { Answer } from '../../models/answer';
+import { Question } from '../../models/question';
 
 import 'rxjs/add/operator/switchMap';
 import { Subscription } from 'rxjs/Subscription';

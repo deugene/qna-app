@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Headers, Http } from '@angular/http';
 
-import { Answer } from '../classes/answer';
+import { Answer } from '../models/answer';
 
 import 'rxjs/add/operator/toPromise';
 

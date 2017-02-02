@@ -10,7 +10,7 @@ import { MockBackend, MockConnection } from '@angular/http/testing';
 import 'rxjs/add/operator/toPromise';
 
 import { QuestionsService } from './questions.service';
-import { Question } from '../classes/question';
+import { Question } from '../models/question';
 
 describe('QuestionsService', () => {
 

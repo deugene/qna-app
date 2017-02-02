@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Headers, Http } from '@angular/http';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
-import { User } from '../classes/user';
+import { User } from '../models/user';
 
 import 'rxjs/add/operator/toPromise';
 

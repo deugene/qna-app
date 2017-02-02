@@ -10,7 +10,7 @@ import { MockBackend, MockConnection } from '@angular/http/testing';
 import 'rxjs/add/operator/toPromise';
 
 import { UsersService } from './users.service';
-import { User } from '../classes/user';
+import { User } from '../models/user';
 
 describe('UsersService', () => {
 

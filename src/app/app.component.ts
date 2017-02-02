@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { UsersService } from './services/users.service';
-import { User } from './classes/user';
+import { User } from './models/user';
 
 import { Subscription } from 'rxjs/Subscription';
 
@@ -27,7 +27,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.subscription.unsubscribe();
+    if (this.subscription) { this.subscription.unsubscribe(); }
   }
 
   changeUser() {

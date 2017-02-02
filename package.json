@@ -7,8 +7,7 @@
     "ng": "ng",
     "start": "node ./server/bin/www",
     "lint": "tslint \"src/**/*.ts\" --project src/tsconfig.json --type-check && tslint \"e2e/**/*.ts\" --project e2e/tsconfig.json --type-check",
-    "test": "ng test",
-    "testapi": "mocha 'server/test/**/*.test.js'",
+    "test": "mocha && ng test --watch false",
     "pree2e": "webdriver-manager update --standalone false --gecko false",
     "e2e": "protractor",
     "dev": "gulp",
@@ -38,11 +37,12 @@
     "sequelize": "^3.28.0",
     "sequelize-cli": "^2.5.1",
     "ts-helpers": "^1.1.1",
+    "typescript": "2.1.5",
     "zone.js": "^0.7.2"
   },
   "devDependencies": {
     "@angular/compiler-cli": "^2.3.1",
-    "@types/jasmine": "2.5.38",
+    "@types/jasmine": "^2.5.38",
     "@types/node": "^6.0.42",
     "chai": "^3.5.0",
     "chai-http": "^3.0.0",
@@ -62,7 +62,6 @@
     "nodemon": "^1.11.0",
     "protractor": "~4.0.13",
     "ts-node": "1.2.1",
-    "tslint": "^4.3.0",
-    "typescript": "~2.0.3"
+    "tslint": "^4.3.0"
   }
 }
