@@ -63,8 +63,8 @@ export class AnswerFormComponent implements OnInit, AfterViewChecked, OnDestroy 
   }
 
   ngOnDestroy() {
-    this.subscriptionUser.unsubscribe();
-    this.subscriptionQuestion.unsubscribe();
+    if (this.subscriptionUser) { this.subscriptionUser.unsubscribe(); }
+    if (this.subscriptionQuestion) { this.subscriptionQuestion.unsubscribe(); }
   }
 
   ngAfterViewChecked() {
@@ -114,10 +114,7 @@ export class AnswerFormComponent implements OnInit, AfterViewChecked, OnDestroy 
         const updates = { body: this.answer.body };
         res(this._answersService.update(this.answer.id, updates));
       })
-        .then(() => {
-          this.answersChange.emit();
-          this.answerForm.reset();
-        })
+        .then(() => this.back())
         .catch(err => {
           if (err) { console.error(err.message); }
         });
@@ -126,6 +123,6 @@ export class AnswerFormComponent implements OnInit, AfterViewChecked, OnDestroy 
 
   back() {
     this.answersChange.emit();
-    this.answerForm.reset();
+    setTimeout(() => this.answerForm.reset(), 30);
   }
 }

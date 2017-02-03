@@ -61,7 +61,7 @@ export class QuestionFormComponent implements OnInit, AfterViewChecked, OnDestro
   }
 
   ngOnDestroy() {
-    this.subscription.unsubscribe();
+    if (this.subscription) { this.subscription.unsubscribe(); }
   }
 
   ngAfterViewChecked() {
@@ -114,10 +114,7 @@ export class QuestionFormComponent implements OnInit, AfterViewChecked, OnDestro
         };
         res(this._questionsService.update(this.question.id, updates));
       })
-        .then(() => {
-          this.questionsChange.emit();
-          this.questionForm.reset();
-        })
+        .then(() => this.back())
         .catch(err => {
           if (err) { console.error(err.message); }
         });
@@ -126,7 +123,7 @@ export class QuestionFormComponent implements OnInit, AfterViewChecked, OnDestro
 
   back() {
     this.questionsChange.emit();
-    this.questionForm.reset();
+    setTimeout(() => this.questionForm.reset(), 30);
   }
 
 }

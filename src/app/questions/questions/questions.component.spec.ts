@@ -3,11 +3,12 @@ import { async, ComponentFixture, TestBed, tick, fakeAsync } from '@angular/core
 import { RouterTestingModule } from '@angular/router/testing';
 import { Routes } from '@angular/router';
 import { By } from '@angular/platform-browser';
-import { DebugElement, Component, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { DebugElement, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { QuestionsComponent } from './questions.component';
 import { QuestionFormComponent } from '../question-form/question-form.component';
+import { DummyComponent } from '../../../testing/components-stubs';
 
 import { UsersService } from '../../services/users.service';
 import {
@@ -24,12 +25,6 @@ import { Ng2PaginationModule } from 'ng2-pagination';
 
 import { Question } from '../../models/question';
 import { Answer } from '../../models/answer';
-
-@Component({
-  template: ''
-})
-class DummyComponent {
-}
 
 const routes: Routes = [
   { path: 'questions/:questionId', component: DummyComponent }

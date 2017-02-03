@@ -8,7 +8,7 @@ const User = models.User;
 module.exports = {
   all(req, res, next) {
 
-    // define find options
+    // define search options
     let opts = {
       offset: req.body.offset,
       limit: req.body.limit,
@@ -24,7 +24,7 @@ module.exports = {
     }
     const status = req.body.status;
 
-    // update find options if answered questions are needed
+    // update search options if answered questions are needed
     if (status && status === 'answered') {
       opts.include[0].where = { questionId: { $ne: null } };
     }
@@ -45,7 +45,7 @@ module.exports = {
           });
         });
 
-    // else search and send questions that match opts
+    // else find and send questions that match opts
     } else {
       Question.findAndCountAll(opts)
         .then(result => {

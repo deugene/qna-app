@@ -19,6 +19,8 @@ import { QuestionFormComponent } from './questions/question-form/question-form.c
 import { AnswerFormComponent } from './answers/answer-form/answer-form.component';
 import { AnswersComponent } from './answers/answers/answers.component';
 
+import { DummyComponent } from '../testing/components-stubs';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -27,7 +29,8 @@ import { AnswersComponent } from './answers/answers/answers.component';
     QuestionSingleComponent,
     QuestionFormComponent,
     AnswerFormComponent,
-    AnswersComponent
+    AnswersComponent,
+    DummyComponent
   ],
   imports: [
     BrowserModule,

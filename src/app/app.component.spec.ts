@@ -4,19 +4,14 @@ import { TestBed, async, fakeAsync, tick } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Routes } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { Component, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 import { UsersService } from './services/users.service';
 
 import { UserServiceStub } from '../testing/services-stubs';
 
 import { AppComponent } from './app.component';
-
-@Component({
-  template: ''
-})
-class DummyComponent {
-}
+import { DummyComponent } from '../testing/components-stubs';
 
 const routes: Routes = [
   { path: '', component: DummyComponent }
